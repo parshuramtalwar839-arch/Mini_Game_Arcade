@@ -1,54 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Game Arcade</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Game Arcade</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:25px 15px;min-height:100vh;
+  font-family:Arial,sans-serif;text-align:center;
+  color:white;background:linear-gradient(135deg,#10152c,#26365c);
+}
+.container{max-width:650px;margin:auto}
+h1{font-size:36px;color:#aebcff}
+p{color:#d1d8ed}
+.card{
+  background:#192440;padding:25px;margin:20px 0;
+  border-radius:18px;border:1px solid #46577c;
+}
+button{
+  padding:13px 18px;margin:6px;border:0;
+  border-radius:10px;background:#879cff;
+  color:#10152c;font-weight:bold;font-size:16px;
+  cursor:pointer;
+}
+button:hover{background:#b2beff}
+input{
+  padding:13px;width:150px;border-radius:9px;
+  border:1px solid #879cff;font-size:17px;
+}
+.result{
+  background:#101a32;padding:15px;border-radius:10px;
+  min-height:48px;margin:18px 0;color:white;
+}
+.score{font-size:22px;font-weight:bold}
+</style>
 </head>
 <body>
-    <header>
-        <h1>Mini Game Arcade</h1>
-        <p>Welcome! Choose a game and have fun while practising programming.</p>
-    </header>
+<div class="container">
 
-    <main>
-        <section>
-            <h2>Games in this project</h2>
+<h1>🎮 Mini Game Arcade</h1>
+<p>Welcome! Choose a game and have fun!</p>
 
-            <article>
-                <h3>1. Rock Paper Scissors</h3>
-                <p>A Python console game. Play against the computer and try to win!</p>
-                <p><strong>File:</strong> <code>python/rock_paper_scissors.py</code></p>
-            </article>
+<div class="card">
+<h2>✊ Rock Paper Scissors</h2>
+<p>First to score 3 points wins!</p>
 
-            <article>
-                <h3>2. Number Guessing Game</h3>
-                <p>A C++ console game. Guess the secret number with hints from the computer.</p>
-                <p><strong>File:</strong> <code>cpp/number_guessing_game.cpp</code></p>
-            </article>
-        </section>
+<div class="score">
+You: <span id="player">0</span>
+&nbsp; | &nbsp;
+Computer: <span id="computer">0</span>
+</div>
 
-        <section>
-            <h2>How to play</h2>
-            <ol>
-                <li>Run the Python file to play Rock Paper Scissors.</li>
-                <li>Compile and run the C++ file to play Number Guessing Game.</li>
-                <li>Read the README file for complete instructions.</li>
-            </ol>
-        </section>
+<button onclick="play('Rock')">✊ Rock</button>
+<button onclick="play('Paper')">✋ Paper</button>
+<button onclick="play('Scissors')">✌️ Scissors</button>
 
-        <section>
-            <h2>Programming concepts used</h2>
-            <ul>
-                <li><strong>HTML:</strong> headings, paragraphs, sections, articles and lists.</li>
-                <li><strong>Python:</strong> variables, input/output, lists, loops, conditions and random numbers.</li>
-                <li><strong>C++:</strong> variables, input/output, loops, conditions and random number generation.</li>
-            </ul>
-        </section>
-    </main>
+<div class="result" id="rpsResult">Choose your move!</div>
+<button onclick="resetRPS()">Restart Game</button>
+</div>
 
-    <footer>
-        <p>Created as a beginner programming project.</p>
-    </footer>
+<div class="card">
+<h2>🔢 Number Guessing Game</h2>
+<p>Guess a secret number between 1 and 100.</p>
+
+<input type="number" id="guess" min="1" max="100"
+placeholder="Enter number">
+
+<button onclick="checkGuess()">Guess</button>
+
+<div class="result" id="guessResult">
+Let's start guessing!
+</div>
+
+<p id="attempts">Attempts: 0</p>
+<button onclick="resetGuess()">New Number</button>
+</div>
+
+</div>
+
+<script>
+let playerScore=0;
+let computerScore=0;
+let gameOver=false;
+
+function play(user){
+  if(gameOver)return;
+
+  const choices=['Rock','Paper','Scissors'];
+  const computer=choices[Math.floor(Math.random()*3)];
+  let message='It is a tie!';
+
+  if(user!==computer){
+    const win=
+      (user==='Rock'&&computer==='Scissors')||
+      (user==='Paper'&&computer==='Rock')||
+      (user==='Scissors'&&computer==='Paper');
+
+    if(win){
+      playerScore++;
+      message='You win this round!';
+    }else{
+      computerScore++;
+      message='Computer wins this round!';
+    }
+  }
+
+  document.getElementById('player').textContent=playerScore;
+  document.getElementById('computer').textContent=computerScore;
+
+  if(playerScore===3){
+    message+=' 🏆 You won the game!';
+    gameOver=true;
+  }else if(computerScore===3){
+    message+=' Computer won the game!';
+    gameOver=true;
+  }
+
+  document.getElementById('rpsResult').textContent=
+    'You: '+user+' | Computer: '+computer+' — '+message;
+}
+
+function resetRPS(){
+  playerScore=0;
+  computerScore=0;
+  gameOver=false;
+  document.getElementById('player').textContent=0;
+  document.getElementById('computer').textContent=0;
+  document.getElementById('rpsResult').textContent='Choose your move!';
+}
+
+let secret=Math.floor(Math.random()*100)+1;
+let tries=0;
+let guessed=false;
+
+function checkGuess(){
+  if(guessed)return;
+
+  const input=document.getElementById('guess');
+  const value=Number(input.value);
+  const result=document.getElementById('guessResult');
+
+  if(input.value===''||!Number.isInteger(value)||value<1||value>100){
+    result.textContent='Enter a whole number between 1 and 100!';
+    return;
+  }
+
+  tries++;
+  document.getElementById('attempts').textContent='Attempts: '+tries;
+
+  if(value===secret){
+    result.textContent='🎉 Correct! You found the number!';
+    guessed=true;
+  }else if(value<secret){
+    result.textContent='Too low! Try a higher number.';
+  }else{
+    result.textContent='Too high! Try a lower number.';
+  }
+}
+
+function resetGuess(){
+  secret=Math.floor(Math.random()*100)+1;
+  tries=0;
+  guessed=false;
+  document.getElementById('guess').value='';
+  document.getElementById('attempts').textContent='Attempts: 0';
+  document.getElementById('guessResult').textContent='New number ready! Start guessing.';
+}
+</script>
 </body>
 </html>
